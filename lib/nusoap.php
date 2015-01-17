@@ -871,6 +871,7 @@ class nusoap_base {
 	 * @access public
 	 */
     function varDump($data) {
+		if ($this->debugLevel > 0) return ''; // This function is said to leak memory. Prod should disable debugLevel
 		ob_start();
 		var_dump($data);
 		$ret_val = ob_get_contents();
@@ -5891,11 +5892,11 @@ class wsdl extends nusoap_base {
 		    	$this->debug("in serializeType: soapval overrides type to $type");
 	    	} else {
 	    		$forceType = false;
-		    	$this->debug("in serializeType: soapval does not override type");
+	    		$this->debug("in serializeType: soapval does not override type");
 	    	}
 	    	$attrs = $value->attributes;
 	    	$value = $value->value;
-	    	$this->debug("in serializeType: soapval overrides value to $value");
+	    	$this->debug('in serializeType: soapval overrides value to ' . var_export($value, true));
 	    	if ($attrs) {
 	    		if (!is_array($value)) {
 	    			$value['!'] = $value;
@@ -6129,7 +6130,7 @@ class wsdl extends nusoap_base {
 				$rows = sizeof($value);
 				$contents = '';
 				foreach($value as $k => $v) {
-					$this->debug("serializing array element: $k, $v of type: $typeDef[arrayType]");
+					$this->debug("serializing array element: $k, " . var_export($v, true) . " of type: $typeDef[arrayType]");
 					//if (strpos($typeDef['arrayType'], ':') ) {
 					if (!in_array($typeDef['arrayType'],$this->typemap['http://www.w3.org/2001/XMLSchema'])) {
 					    $contents .= $this->serializeType('item', $typeDef['arrayType'], $v, $use);
